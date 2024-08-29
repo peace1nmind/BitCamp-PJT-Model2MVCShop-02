@@ -49,7 +49,13 @@ public class ListProductAction extends Action {
 		
 		// 검색한 리스트값들을 다루는 로직
 		ProductService productService = new ProductServiceImpl();
-		Map<String, Object> map = productService.getProductList(search);
+		
+		
+		
+		
+		Map<String, Object> map = (menu.equals("search")) ? 
+									productService.getProductList(search) : 
+									productService.getProductList(search);
 		request.setAttribute("map", map);
 		request.setAttribute("list", map.get("list"));
 		

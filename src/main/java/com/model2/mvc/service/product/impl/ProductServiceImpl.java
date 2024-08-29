@@ -32,6 +32,11 @@ public class ProductServiceImpl implements ProductService {
 
 		return productDao.getProductList(search);
 	}
+	
+	public Map<String, Object> getProductList(Search search, String tranCode, boolean over) {
+
+		return productDao.getProductList(search, tranCode, over);
+	}
 
 	@Override
 	public Product updateProduct(Product product) {
