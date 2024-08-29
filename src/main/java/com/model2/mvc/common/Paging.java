@@ -10,7 +10,7 @@ public class Paging {
 	private int end = 1;
 	private int total;
 	private int totalPage;
-	private int currentPage;
+	private int currentPage = 1;
 	private boolean left;
 	private boolean right;
 	int pageSize;			// 페이지당 보여줄 행 개수

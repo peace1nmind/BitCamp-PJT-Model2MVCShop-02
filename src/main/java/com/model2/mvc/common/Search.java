@@ -30,8 +30,11 @@ public class Search {
 	public int getCurrentPage() {
 		return curruntPage;
 	}
-	public void setCurrentPage(int curruntPage) {
-		this.curruntPage = curruntPage;
+	public void setCurrentPage(int currentPage) {
+		if (currentPage == 0) {
+			currentPage = 1;
+		}
+		this.curruntPage = currentPage;
 	}
 
 	public String getSearchCondition() {

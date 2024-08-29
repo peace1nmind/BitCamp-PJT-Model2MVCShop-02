@@ -1,21 +1,17 @@
-<%@page import="com.model2.mvc.common.Paging"%>
-<%@page import="com.model2.mvc.service.TranCodeMapper"%>
-<%@page import="com.model2.mvc.service.domain.Product"%>
-<%@page import="com.model2.mvc.common.Search"%>
 <%@page import="com.model2.mvc.Debug"%>
-<%@page import="java.util.Map"%>
-<%@page import="javax.swing.event.SwingPropertyChangeSupport"%>
-<%@page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.util.HashMap"%>
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
     pageEncoding="EUC-KR"%>
-    
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+ 
 <%	Debug.startJsp("listProduct"); %>
     
 <!DOCTYPE html>
+
 <html>
+
 	<head>
+	
 		<title>${title }</title>
 		
 		<link rel="stylesheet" href="/css/admin.css" type="text/css">
@@ -26,7 +22,19 @@
 			document.detailForm.submit();
 		}
 		-->
+		
 		</script>
+		
+		<style>
+	        a.disabled {
+	            pointer-events: none; /* 링크 클릭 비활성화 */
+	            color: #FFFFFF; /* 비활성화 된 링크의 색상 변경 */
+	            text-decoration: none; /* 링크 밑줄 제거 */
+	            cursor: default; /* 기본 커서로 변경 */
+	        }
+	        
+    	</style>
+		
 	</head>
 
 	<body bgcolor="#ffffff" text="#000000">
@@ -60,20 +68,21 @@
 				
 				<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
 					<tr>
-						
 						<td align="right">
 							<select name="searchCondition" class="ct_input_g" style="width:80px">
-								<%	Search search = (Search) request.getAttribute("search"); %>
-								<option value="0" <%= (search.getSearchCondition().equals("0"))? "selected": "" %>>
+								
+								<option value="0" ${(search.searchCondition=='0')? "selected":"" }>
 									상품번호
 								</option>
-								<option value="1" <%= (search.getSearchCondition().equals("1"))? "selected": "" %>>
+								<option value="1" ${(search.searchCondition=='1')? "selected":"" }>
 									상품명
 								</option>
-								<option value="2" <%= (search.getSearchCondition().equals("2"))? "selected": "" %>>
+								<option value="2" ${(search.searchCondition=='2')? "selected":"" }>
 									상품가격
 								</option>
+								
 							</select>
+							
 							<input type="text" name="searchKeyword" value="${search.searchKeyword }" 
 									class="ct_input_g" style="width:200px; height:19px" />
 						</td>
@@ -116,106 +125,103 @@
 						<td colspan="11" bgcolor="808285" height="1"></td>
 					</tr>
 					
-					<%	
-						int no = Integer.parseInt((String)request.getAttribute("no"));
-						List<Product> productList = (List<Product>) request.getAttribute("list");
-						for(Product product : productList) {
-					%>
-					<tr class="ct_list_pop">
-						<td align="center"> <%= no-- %></td>
-						<td></td>
-								
-						<td align="left">
-							<a href="/${navi }?prodNo=<%= product.getProdNo() %>&menu=${menu}">
-								<%= product.getProdName() %>
-							</a>
-						</td>
-						
-						<td></td>
-						<td align="left"><%= product.getPrice() %></td>
-						<td></td>
-						<td align="left"><%= product.getRegDate() %></td>
-						<td></td>
-						
-						<% String tranCode = product.getProTranCode().trim(); %>
-						<td align="left">
-							<% Map<String, String> tranCodeMap = TranCodeMapper.getInstance().getMap(); %>
-							<%= tranCodeMap.get(tranCode) %>
+					<c:forEach items="${list }" var="product" varStatus="status">
+					
+						<tr class="ct_list_pop">
+							<td align="center">${status.count }</td>
+							<td></td>
+									
+							<td align="left">
+								<a href="/${navi }?prodNo=${product.prodNo }&menu=${menu}">
+									${product.prodName }
+								</a>
+							</td>
 							
-						<% if (menu.equals("manage") && tranCode.equals("2")) { %>
-							&nbsp;
-							<a href="/updateTranCodeByProd.do?page=${paging.currentPage }&prodNo=<%= product.getProdNo() %>">
-								배송하기
-							</a>
-						<% } %>
+							<td></td>
+							<td align="left">${product.price }</td>
+							<td></td>
+							<td align="left">${product.regDate }</td>
+							<td></td>
+							
+							<td align="left">
+								${tranCodeMap[product.proTranCode] }
+								
+							<c:if test="${menu=='manage' && product.proTranCode=='2' }">
+								&nbsp;
+								<a href="/updateTranCodeByProd.do?page=${paging.currentPage }&prodNo=${product.prodNo}">
+									배송하기
+								</a>
+							</c:if>
+							
+							</td>	
+						</tr>
+						<tr>
+							<td colspan="11" bgcolor="D6D7D6" height="1"></td>
+						</tr>	
 						
-						</td>	
-					</tr>
-					<tr>
-						<td colspan="11" bgcolor="D6D7D6" height="1"></td>
-					</tr>	
-					<%	} %>
+					</c:forEach>
 					
 				</table>
 				
 				<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
 					<tr>
 						<td align="center">
-					<%	Paging paging = (Paging) request.getAttribute("paging"); %>
-					<%	if (paging.isLeft()) { %>
+					
+					
 					
 							<a href="/listProduct.do?page=1
 													&menu=${menu }
-													&searchCondition=<%= searchVO.getSearchCondition() %>
-													&searchKeyword=<%= searchVO.getSearchKeyword() %>">
+													&searchCondition=${search.searchCondition }
+													&searchKeyword=${search.searchCondition }" 
+							${(paging.left)? "":"class='disabled'" }>
 								<span>◀</span>
 							</a>
 							
 							&nbsp;
 							
-							<a href="/listProduct.do?page=<%= paging.getStart()-1 %>
-													&menu=<%= menu %>
-													&searchCondition=<%= searchVO.getSearchCondition() %>
-													&searchKeyword=<%= searchVO.getSearchKeyword() %>">
+							<a href="/listProduct.do?page=${paging.start - 1 }
+													&menu=${menu }
+													&searchCondition=${search.searchCondition }
+													&searchKeyword=${search.searchCondition }" 
+							${(paging.left)? "":"class='disabled'" }>
 								<span>이전</span>
 							</a>
 							
-					<%	} %>
 					
 							&nbsp;&nbsp;
 							
-					<%	for (int i=paging.getStart(); i<=paging.getEnd(); i++) { %>
-							<a href="/listProduct.do?page=<%= i %>
-													&menu=<%= menu %>
-													&searchCondition=<%= searchVO.getSearchCondition() %>
-													&searchKeyword=<%= searchVO.getSearchKeyword() %>" 
-							<%= (currentPage==i)? "style='font-weight: bold; font-size: 15px'" : ""%>>
-								<%= i %>
+					<c:forEach begin="${paging.start }" end="${paging.end }" var="i" >
+							<a href="/listProduct.do?page=${i }
+													&menu=${menu }
+													&searchCondition=${search.searchCondition }
+													&searchKeyword=${search.searchCondition }" 
+							${(paging.currentPage==i)? "style='font-weight: bold; font-size: 15px'" : "" }>
+								${i }
 							</a>
-					<%	} %>
+					</c:forEach>
 					
 							&nbsp;&nbsp;
+						
 							
-					<%	if (paging.isRight()) { %>
-							
-							<a href="/listProduct.do?page=<%= paging.getEnd()+1 %>
-													&menu=<%= menu %>
-													&searchCondition=<%= searchVO.getSearchCondition() %>
-													&searchKeyword=<%= searchVO.getSearchKeyword() %>">
+							<a href="/listProduct.do?page=${paging.end + 1 }
+													&menu=${menu }
+													&searchCondition=${search.searchCondition }
+													&searchKeyword=${search.searchCondition }" 
+							${(paging.right)? "":"class='disabled'" }>
 								<span>다음</span>
 							</a>
 							
 							&nbsp;
 							
-							<a href="/listProduct.do?page=<%= totalPage %>
-													&menu=<%= menu %>
-													&searchCondition=<%= searchVO.getSearchCondition() %>
-													&searchKeyword=<%= searchVO.getSearchKeyword() %>">
+							<a href="/listProduct.do?page=${paging.totalPage }
+													&menu=${menu }
+													&searchCondition=${search.searchCondition }
+													&searchKeyword=${search.searchCondition }" 
+							${(paging.right)? "":"class='disabled'" }>
 								<span>▶</span>
 							</a>
 							
-					<%	} %>
-					
+
 				    	</td>
 					</tr>
 				</table>

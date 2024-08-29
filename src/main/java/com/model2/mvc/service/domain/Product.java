@@ -22,7 +22,7 @@ public class Product {
 		return proTranCode;
 	}
 	public void setProTranCode(String proTranCode) {
-		this.proTranCode = proTranCode;
+		this.proTranCode = proTranCode.trim();
 	}
 	public String getFileName() {
 		return fileName;
